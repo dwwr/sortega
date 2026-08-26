@@ -1,0 +1,356 @@
+:root {
+  --bg0: #12151a;
+  --bg1: #1a1f27;
+  --bg2: #242b36;
+  --ink: #eef2f7;
+  --muted: #9aa6b5;
+  --line: #323b49;
+  --file: #2f9e6b;
+  --file-soft: rgba(47, 158, 107, 0.18);
+  --delete: #d4524c;
+  --delete-soft: rgba(212, 82, 76, 0.18);
+  --skip: #6b7788;
+  --accent: #d6a45a;
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  --radius: 18px;
+  --font: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --ui: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, #2a3342 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, #2b2218 0%, transparent 50%),
+    var(--bg0);
+  color: var(--ink);
+  font-family: var(--ui);
+}
+
+body {
+  min-height: 100vh;
+}
+
+.shell {
+  width: min(720px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 1.5rem 0 3rem;
+}
+
+.top {
+  margin-bottom: 1.25rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.brand-mark {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  background: linear-gradient(135deg, var(--accent), #8c5a2b);
+  box-shadow: 0 0 0 4px rgba(214, 164, 90, 0.15);
+}
+
+.brand h1 {
+  margin: 0;
+  font-family: var(--font);
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.controls {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg1) 92%, black);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.field span {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--ink);
+  font: inherit;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn.primary {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+  background: linear-gradient(180deg, #3a2f20, #2a2319);
+  color: #f4e6cc;
+}
+
+.btn:hover,
+.fab:hover {
+  filter: brightness(1.08);
+}
+
+.stage {
+  margin-top: 1.25rem;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.deck {
+  position: relative;
+  height: min(68vh, 640px);
+  min-height: 420px;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  border-radius: calc(var(--radius) + 4px);
+  overflow: hidden;
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  transform-origin: 50% 110%;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card.behind {
+  transform: scale(0.97) translateY(10px);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.card.dragging {
+  transition: none;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55);
+}
+
+.stamp {
+  position: absolute;
+  top: 1.1rem;
+  z-index: 3;
+  padding: 0.35rem 0.7rem;
+  border: 3px solid currentColor;
+  border-radius: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stamp-file {
+  left: 1.1rem;
+  color: var(--file);
+  transform: rotate(-12deg);
+}
+
+.stamp-delete {
+  right: 1.1rem;
+  color: var(--delete);
+  transform: rotate(12deg);
+}
+
+.preview {
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 50% 40%, #2a3342 0%, transparent 55%),
+    #0d1014;
+  overflow: hidden;
+  text-align: center;
+}
+
+.favicon {
+  width: 128px;
+  height: 128px;
+  margin: 0 auto;
+  border-radius: 28px;
+  background: #fff;
+  object-fit: contain;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.favicon-fallback {
+  width: 128px;
+  height: 128px;
+  margin: 0 auto;
+  border-radius: 28px;
+  display: grid;
+  place-content: center;
+  background: linear-gradient(160deg, #3a4556, #1c222c);
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 3.5rem;
+  font-weight: 600;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.preview-host {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.meta {
+  padding: 1rem 1.1rem 1.15rem;
+  border-top: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg1) 88%, #000);
+}
+
+.title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font);
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+
+.url {
+  display: block;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  word-break: break-all;
+}
+
+.url:hover {
+  text-decoration: underline;
+}
+
+.folder {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.fab {
+  min-width: 6.5rem;
+  padding: 0.8rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fab.delete {
+  background: var(--delete-soft);
+  border-color: color-mix(in srgb, var(--delete) 45%, var(--line));
+  color: #ffb3af;
+}
+
+.fab.file {
+  background: var(--file-soft);
+  border-color: color-mix(in srgb, var(--file) 45%, var(--line));
+  color: #9be4c0;
+}
+
+.fab.skip {
+  color: #c4ceda;
+}
+
+.hint {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0.9rem 0 0;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg1) 80%, transparent);
+}
+
+.empty p {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1.6rem;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 560px) {
+  .deck {
+    min-height: 360px;
+    height: 58vh;
+  }
+
+  .fab {
+    min-width: 0;
+    flex: 1;
+  }
+}
