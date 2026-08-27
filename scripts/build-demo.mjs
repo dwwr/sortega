@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
@@ -8,6 +8,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const demoDir = join(root, "dist", "demo");
 const storybookOut = join(root, "storybook-static");
+const spaRoutes = ["about", "privacy", "contact"];
 
 function run(command, args) {
   const result = spawnSync(command, args, {
@@ -34,6 +35,21 @@ if (existsSync(builtHtml)) {
   renameSync(builtHtml, indexHtml);
 }
 
+// Static-host SPA fallbacks so /about etc. work without server rewrites.
+for (const route of spaRoutes) {
+  const dir = join(demoDir, route);
+  mkdirSync(dir, { recursive: true });
+  cpSync(indexHtml, join(dir, "index.html"));
+}
+
+// SPA fallbacks for legal routes. Do not swallow /storybook/* — those are real files.
+writeFileSync(
+  join(demoDir, "_redirects"),
+  ["/storybook/*  /storybook/:splat  200", "/*    /index.html   200", ""].join(
+    "\n",
+  ),
+);
+
 run("npx", ["storybook", "build", "--output-dir", "storybook-static"]);
 
 if (!existsSync(storybookOut)) {
@@ -44,4 +60,4 @@ if (!existsSync(storybookOut)) {
 mkdirSync(join(demoDir, "storybook"), { recursive: true });
 cpSync(storybookOut, join(demoDir, "storybook"), { recursive: true });
 
-console.log("Built dist/demo (app + storybook/)");
+console.log("Built dist/demo (app + about/privacy/contact + storybook/)");

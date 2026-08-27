@@ -11,9 +11,10 @@ const config = {
       ...config.resolve.alias,
       "webextension-polyfill": resolve("src/app/lib/browser-mock.js"),
     };
-    // Nested under dist/demo/storybook/ — relative assets work at site root or a subpath.
+    // Production static files live at dist/demo/storybook and are served at /storybook/
+    // (same pattern as earf-quake / ca-llc-field-manual).
     if (configType === "PRODUCTION") {
-      config.base = "./";
+      config.base = "/storybook/";
     }
     return config;
   },

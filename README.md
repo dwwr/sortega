@@ -56,7 +56,7 @@ Local UI preview with mock bookmarks (no real extension APIs):
 npm run dev
 ```
 
-Open the Local URL Vite prints (e.g. `http://localhost:5173/`). You’ll see a demo banner and an amber **Open Storybook** pill. For Storybook in that link during local preview, run `npm run storybook` in a second terminal (Vite proxies `./storybook/` → `:6006`).
+Open the Local URL Vite prints (e.g. `http://localhost:5173/`). You’ll see a demo banner and an amber **Open Storybook** pill. Run `npm run storybook` in a second terminal — the pill opens Storybook at `http://localhost:6006/` (Storybook’s Vite preview cannot be proxied under `/storybook/` in dev).
 
 Production static site (app + nested Storybook):
 
@@ -70,7 +70,7 @@ Output: `dist/demo/` (index + assets) and `dist/demo/storybook/`. Host that fold
 npm run preview:demo
 ```
 
-Demo-only UI (banner + Storybook CTA) is **not** included in extension builds.
+Demo-only UI (banner, Storybook CTA, footer, About / Privacy / Contact) is **not** included in extension builds. Optional public contact email: copy `.env.example` → `.env` and set `VITE_CONTACT_EMAIL` when building the demo.
 
 ### Storybook alone
 
@@ -127,6 +127,7 @@ src/
     stories/fixtures.js
     copy.js               # all user-facing strings
     demoCopy.js / demo.css / DemoExtras.jsx / main-demo.jsx  # demo-only
+    demo/                   # demo site shell, footer, legal pages
     demo.html             # demo Vite entry (→ index.html in dist/demo)
     lib/
       browser-mock.js     # mock bookmarks for demo / Storybook

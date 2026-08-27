@@ -2,6 +2,17 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "node:path";
 
+const DEMO_SPA_PATHS = new Set([
+  "/",
+  "/index.html",
+  "/about",
+  "/about/",
+  "/privacy",
+  "/privacy/",
+  "/contact",
+  "/contact/",
+]);
+
 export default defineConfig(({ command, mode }) => {
   // Demo showcase: `vite` / `vite build --mode demo`
   // Extension package: `vite build --mode extension` via scripts/build.mjs
@@ -9,8 +20,8 @@ export default defineConfig(({ command, mode }) => {
 
   return {
     root: resolve("src/app"),
-    base: "./",
-    // `vite` / demo build use demo.html; extension build uses index.html → main.jsx
+    // Demo uses absolute routes (/about) like earf-quake; extension stays relative.
+    base: isDemo ? "/" : "./",
     appType: "spa",
     plugins: [
       react(),
@@ -19,8 +30,26 @@ export default defineConfig(({ command, mode }) => {
         configureServer(server) {
           if (!isDemo) return;
           server.middlewares.use((req, _res, next) => {
-            if (req.url === "/" || req.url === "/index.html") {
+            const path = req.url?.split("?")[0] || "";
+            if (DEMO_SPA_PATHS.has(path)) {
               req.url = "/demo.html";
+            }
+            next();
+          });
+        },
+        configurePreviewServer(server) {
+          if (!isDemo) return;
+          server.middlewares.use((req, _res, next) => {
+            const path = req.url?.split("?")[0] || "";
+            if (
+              path === "/about" ||
+              path === "/about/" ||
+              path === "/privacy" ||
+              path === "/privacy/" ||
+              path === "/contact" ||
+              path === "/contact/"
+            ) {
+              req.url = "/index.html";
             }
             next();
           });
@@ -36,15 +65,7 @@ export default defineConfig(({ command, mode }) => {
     },
     server: isDemo
       ? {
-          open: "/demo.html",
-          proxy: {
-            "/storybook": {
-              target: "http://127.0.0.1:6006",
-              changeOrigin: true,
-              rewrite: (path) => path.replace(/^\/storybook/, "") || "/",
-              ws: true,
-            },
-          },
+          open: "/",
         }
       : undefined,
     build: {
