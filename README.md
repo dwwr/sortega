@@ -72,6 +72,25 @@ npm run preview:demo
 
 Demo-only UI (banner, Storybook CTA, footer, About / Privacy / Contact) is **not** included in extension builds. Optional public contact email: copy `.env.example` → `.env` and set `VITE_CONTACT_EMAIL` when building the demo.
 
+### Deploy demo to Vercel
+
+This repo’s `vercel.json` builds **only** the demo site (`npm run build:demo` → `dist/demo`). Extension packages are not deployed.
+
+1. Push the repo to GitHub (or another Git remote Vercel supports).
+2. In [Vercel](https://vercel.com/new): **Add New Project** → import this repo.
+3. Leave Framework Preset as **Other** (or blank). Build settings are already in `vercel.json`:
+   - Build Command: `npm run build:demo`
+   - Output Directory: `dist/demo`
+4. Optional: Project → Settings → Environment Variables → add `VITE_CONTACT_EMAIL` for Production (and Preview if you want).
+5. Deploy. The site serves `/`, `/about`, `/privacy`, `/contact`, and `/storybook/`.
+
+CLI alternative (from the repo root, after `npm i -g vercel` or via `npx`):
+
+```bash
+npx vercel        # preview
+npx vercel --prod # production
+```
+
 ### Storybook alone
 
 ```bash

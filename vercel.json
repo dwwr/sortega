@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm install",
+  "buildCommand": "npm run build:demo",
+  "outputDirectory": "dist/demo",
+  "rewrites": [
+    {
+      "source": "/storybook",
+      "destination": "/storybook/index.html"
+    },
+    {
+      "source": "/((?!storybook/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
