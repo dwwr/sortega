@@ -48,6 +48,14 @@ npm run dev
 
 Open the Local URL Vite prints (e.g. `http://localhost:5173/`). The page uses fake bookmarks so layout/swipe work in a normal browser. For real bookmarks, use `watch:chrome` / a packed extension instead.
 
+### Storybook
+
+```bash
+npm run storybook
+```
+
+Opens component stories for `BookmarkCard`, `SetupPanel`, `DeletedList`, and `DeckStage` (with shared fixtures under `src/app/stories/`).
+
 ## Load unpacked (Chrome)
 
 1. Open `chrome://extensions`
@@ -89,9 +97,11 @@ src/
   app/                    # React swipe UI (Vite root)
     main.jsx
     App.jsx
-    components/
+    components/           # UI + *.stories.jsx
+    stories/fixtures.js
     lib/
     styles.css
+.storybook/               # Storybook config
 vite.config.js
 scripts/build.mjs         # Vite bundle + per-browser package
 dist/chrome|firefox/      # generated packages (gitignored)
