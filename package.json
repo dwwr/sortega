@@ -9,6 +9,8 @@
     "build": "node scripts/build.mjs",
     "build:chrome": "node scripts/build.mjs chrome",
     "build:firefox": "node scripts/build.mjs firefox",
+    "build:demo": "node scripts/build-demo.mjs",
+    "preview:demo": "vite preview --mode demo",
     "watch:chrome": "node scripts/watch-chrome.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

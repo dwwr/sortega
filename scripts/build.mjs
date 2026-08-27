@@ -16,6 +16,7 @@ async function buildApp() {
   rmSync(appBundleDir, { recursive: true, force: true });
   await viteBuild({
     configFile: join(root, "vite.config.js"),
+    mode: "extension",
     logLevel: "warn",
   });
 }

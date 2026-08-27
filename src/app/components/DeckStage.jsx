@@ -38,11 +38,14 @@ export default function DeckStage({
         ) : (
           [...visible].reverse().map((bookmark, index, arr) => {
             const isTop = index === arr.length - 1;
+            // Promote the peek while the top card flies out so it eases up
+            // instead of popping after the queue advances.
+            const behind = !isTop && !flyAction;
             return (
               <BookmarkCard
                 key={bookmark.id}
                 bookmark={bookmark}
-                behind={!isTop}
+                behind={behind}
                 busy={busy}
                 flyAction={isTop ? flyAction : null}
                 destIsTrash={destIsTrash}
