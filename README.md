@@ -85,6 +85,8 @@ Opens component stories for `BookmarkCard`, `SetupPanel`, `DeletedList`, and `De
 
 Each card shows a large site favicon, title, and URL (open the link to inspect the page).
 
+The UI follows a macOS Tahoe–inspired **Liquid Glass** look: translucent bubbly panels, soft specular edges, and a colorful mesh backdrop (with reduced-transparency / reduced-motion fallbacks).
+
 Deleted bookmarks accumulate in **Trash** (home and swipe screens) with per-item **Restore**, plus **Restore all** and **Empty trash**. Restore puts bookmarks back in their original folder.
 
 ## Project layout
