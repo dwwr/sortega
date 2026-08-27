@@ -137,8 +137,19 @@ body::before {
   font-size: clamp(2rem, 5vw, 2.7rem);
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: var(--ink);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    #5a7fb8 28%,
+    #3d5f9a 62%,
+    #2f4f8c 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.55))
+    drop-shadow(0 8px 18px rgba(60, 100, 160, 0.18));
 }
 
 .tagline {
