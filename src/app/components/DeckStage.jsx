@@ -1,4 +1,5 @@
 import BookmarkCard from "./BookmarkCard.jsx";
+import DeletedList from "./DeletedList.jsx";
 
 export default function DeckStage({
   queue,
@@ -6,8 +7,12 @@ export default function DeckStage({
   busy,
   flyAction,
   destIsTrash,
+  deletedItems,
   onAction,
   onReset,
+  onUndoDelete,
+  onRestoreAll,
+  onEmptyTrash,
 }) {
   const visible = queue.slice(0, 2);
   const sendLabel = destIsTrash ? "Delete" : "File";
@@ -83,6 +88,14 @@ export default function DeckStage({
         Drag the card, use the buttons, or arrow keys. Esc undoes the last
         action.
       </p>
+
+      <DeletedList
+        items={deletedItems}
+        onRestore={onUndoDelete}
+        onRestoreAll={onRestoreAll}
+        onEmptyTrash={onEmptyTrash}
+        busy={busy}
+      />
     </main>
   );
 }

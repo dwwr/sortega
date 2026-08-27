@@ -77,6 +77,8 @@ Open the Local URL Vite prints (e.g. `http://localhost:5173/`). The page uses fa
 
 Each card shows a large site favicon, title, and URL (open the link to inspect the page).
 
+Deleted bookmarks accumulate in **Trash** (home and swipe screens) with per-item **Restore**, plus **Restore all** and **Empty trash**. Restore puts bookmarks back in their original folder.
+
 ## Project layout
 
 ```

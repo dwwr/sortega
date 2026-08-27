@@ -4,6 +4,7 @@ import SetupPanel from "./components/SetupPanel.jsx";
 import DeckStage from "./components/DeckStage.jsx";
 import {
   STORAGE_KEY,
+  DELETED_STORAGE_KEY,
   DEST_TRASH,
   bookmarksForSource,
   destinationLabel,
@@ -16,6 +17,10 @@ import {
 
 const emptyStats = { filed: 0, deleted: 0, skipped: 0 };
 
+function newLogId() {
+  return crypto.randomUUID();
+}
+
 export default function App() {
   const [folders, setFolders] = useState([]);
   const [sourceFolderId, setSourceFolderId] = useState("all");
@@ -26,6 +31,7 @@ export default function App() {
   const [stats, setStats] = useState(emptyStats);
   const [busy, setBusy] = useState(false);
   const [flyAction, setFlyAction] = useState(null);
+  const [deletedItems, setDeletedItems] = useState([]);
 
   const undoStackRef = useRef([]);
   const queueRef = useRef(queue);
@@ -33,6 +39,7 @@ export default function App() {
   const activeRef = useRef(active);
   const destRef = useRef(destFolderId);
   const flyActionRef = useRef(flyAction);
+  const deletedReadyRef = useRef(false);
 
   const destIsTrash = isTrashDestination(destFolderId);
 
@@ -64,7 +71,10 @@ export default function App() {
 
         setFolders(flat.folders);
 
-        const saved = await browser.storage.local.get(STORAGE_KEY);
+        const saved = await browser.storage.local.get([
+          STORAGE_KEY,
+          DELETED_STORAGE_KEY,
+        ]);
         const settings = saved[STORAGE_KEY] || {};
         const sourceOk =
           settings.sourceFolderId === "all" ||
@@ -75,11 +85,19 @@ export default function App() {
 
         setSourceFolderId(sourceOk ? settings.sourceFolderId : "all");
         setDestFolderId(destOk ? settings.destFolderId : DEST_TRASH);
+
+        const storedDeleted = saved[DELETED_STORAGE_KEY];
+        if (Array.isArray(storedDeleted)) {
+          setDeletedItems(storedDeleted);
+        }
       } catch (error) {
         console.error(error);
         window.alert(`Could not load bookmarks: ${error.message || error}`);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          deletedReadyRef.current = true;
+          setLoading(false);
+        }
       }
     }
 
@@ -88,6 +106,13 @@ export default function App() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!deletedReadyRef.current) return;
+    browser.storage.local.set({ [DELETED_STORAGE_KEY]: deletedItems }).catch(
+      (error) => console.error(error),
+    );
+  }, [deletedItems]);
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -153,20 +178,136 @@ export default function App() {
     }
   }
 
+  function rememberDeleted(entry) {
+    setDeletedItems((items) => [entry, ...items]);
+  }
+
+  function forgetDeleted(logId) {
+    setDeletedItems((items) => items.filter((item) => item.logId !== logId));
+  }
+
   async function deleteBookmark(bookmark) {
     const before = await browser.bookmarks.get(bookmark.id);
     await browser.bookmarks.remove(bookmark.id);
-    undoStackRef.current.push({
-      type: "delete",
-      bookmark: {
-        ...bookmark,
-        title: before[0]?.title || bookmark.title,
-        url: before[0]?.url || bookmark.url,
-      },
+    const logId = newLogId();
+    const entry = {
+      logId,
+      title: before[0]?.title || bookmark.title,
+      url: before[0]?.url || bookmark.url,
       previousParentId: before[0]?.parentId,
       previousIndex: before[0]?.index,
+      folderPath: bookmark.folderPath || "",
+    };
+    rememberDeleted(entry);
+    undoStackRef.current.push({
+      type: "delete",
+      logId,
+      bookmark: {
+        ...bookmark,
+        title: entry.title,
+        url: entry.url,
+      },
+      previousParentId: entry.previousParentId,
+      previousIndex: entry.previousIndex,
     });
     setStats((s) => ({ ...s, deleted: s.deleted + 1 }));
+  }
+
+  async function restoreDeletedEntry(entry) {
+    if (!entry.previousParentId) {
+      throw new Error("Original folder is unknown.");
+    }
+    const created = await browser.bookmarks.create({
+      parentId: entry.previousParentId,
+      title: entry.title,
+      url: entry.url,
+      index: entry.previousIndex,
+    });
+    return {
+      id: created.id,
+      title: entry.title,
+      url: entry.url,
+      parentId: entry.previousParentId,
+      folderPath: entry.folderPath || "",
+    };
+  }
+
+  async function undoDeleteFromList(logId) {
+    if (busyRef.current) return;
+    const entry = deletedItems.find((item) => item.logId === logId);
+    if (!entry) return;
+
+    setBusy(true);
+    try {
+      const restored = await restoreDeletedEntry(entry);
+      forgetDeleted(logId);
+      undoStackRef.current = undoStackRef.current.filter(
+        (item) => item.logId !== logId,
+      );
+      if (activeRef.current) {
+        setStats((s) => ({ ...s, deleted: Math.max(0, s.deleted - 1) }));
+        setQueue((q) => [restored, ...q]);
+      }
+    } catch (error) {
+      console.error(error);
+      window.alert(`Restore failed: ${error.message || error}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function restoreAllDeleted() {
+    if (busyRef.current || deletedItems.length === 0) return;
+    setBusy(true);
+    const pending = [...deletedItems];
+    const restored = [];
+    const remaining = [];
+
+    try {
+      for (const entry of pending) {
+        try {
+          restored.push(await restoreDeletedEntry(entry));
+          undoStackRef.current = undoStackRef.current.filter(
+            (item) => item.logId !== entry.logId,
+          );
+        } catch (error) {
+          console.error(error);
+          remaining.push(entry);
+        }
+      }
+
+      setDeletedItems(remaining);
+
+      if (activeRef.current && restored.length > 0) {
+        setStats((s) => ({
+          ...s,
+          deleted: Math.max(0, s.deleted - restored.length),
+        }));
+        setQueue((q) => [...restored, ...q]);
+      }
+
+      if (remaining.length > 0) {
+        window.alert(
+          `Restored ${restored.length}, but ${remaining.length} failed.`,
+        );
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function emptyTrash() {
+    if (busyRef.current || deletedItems.length === 0) return;
+    const confirmed = window.confirm(
+      `Empty trash? This clears ${deletedItems.length} item(s) from the list. Bookmarks already removed stay deleted.`,
+    );
+    if (!confirmed) return;
+
+    const logIds = new Set(deletedItems.map((item) => item.logId));
+    setDeletedItems([]);
+    undoStackRef.current = undoStackRef.current.filter(
+      (item) => !(item.type === "delete" && logIds.has(item.logId)),
+    );
   }
 
   async function resolveAction(action) {
@@ -179,8 +320,6 @@ export default function App() {
     const trashDest = isTrashDestination(dest);
     setBusy(true);
 
-    // Keep fly direction aligned with the gesture/button, even when
-    // destination Trash turns a "file" action into a delete.
     let fly = action;
 
     try {
@@ -238,6 +377,7 @@ export default function App() {
           url: last.bookmark.url,
           index: last.previousIndex,
         });
+        if (last.logId) forgetDeleted(last.logId);
         setStats((s) => ({ ...s, deleted: Math.max(0, s.deleted - 1) }));
         setQueue((q) => [
           { ...last.bookmark, id: created.id, parentId: last.previousParentId },
@@ -308,6 +448,11 @@ export default function App() {
           sourceFolderId={sourceFolderId}
           destFolderId={destFolderId}
           loading={loading}
+          deletedItems={deletedItems}
+          undoBusy={busy}
+          onUndoDelete={undoDeleteFromList}
+          onRestoreAll={restoreAllDeleted}
+          onEmptyTrash={emptyTrash}
           onSourceChange={(value) => {
             setSourceFolderId(value);
             saveSettings(value, destFolderId);
@@ -325,8 +470,12 @@ export default function App() {
           busy={busy}
           flyAction={flyAction}
           destIsTrash={destIsTrash}
+          deletedItems={deletedItems}
           onAction={resolveAction}
           onReset={resetToSetup}
+          onUndoDelete={undoDeleteFromList}
+          onRestoreAll={restoreAllDeleted}
+          onEmptyTrash={emptyTrash}
         />
       )}
     </div>
