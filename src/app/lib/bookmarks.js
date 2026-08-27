@@ -1,5 +1,23 @@
 export const STORAGE_KEY = "sortega.settings.v1";
+export const DELETED_STORAGE_KEY = "sortega.deleted.v1";
 export const SWIPE_THRESHOLD = 120;
+/** Sentinel destination id — not a real bookmark folder. */
+export const DEST_TRASH = "__trash__";
+
+export function isTrashDestination(destId) {
+  return destId === DEST_TRASH;
+}
+
+export function sourceLabel(sourceId, folders) {
+  if (sourceId === "all") return "All bookmarks";
+  return folders.find((f) => f.id === sourceId)?.path || "Unknown folder";
+}
+
+export function destinationLabel(destId, folders) {
+  if (isTrashDestination(destId)) return "Trash (delete)";
+  return folders.find((f) => f.id === destId)?.path || "Unknown folder";
+}
+
 
 export function hostnameOf(url) {
   try {

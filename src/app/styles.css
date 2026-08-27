@@ -47,10 +47,24 @@ body {
   margin-bottom: 1.25rem;
 }
 
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  min-width: 0;
+}
+
+.btn.home {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
 }
 
 .brand-mark {
@@ -75,6 +89,37 @@ body {
   font-size: 0.95rem;
 }
 
+.route {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.55rem;
+  margin: 0.85rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg1) 88%, black);
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.route-from,
+.route-to {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.route-to {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.route-arrow {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
 .controls {
   display: grid;
   gap: 0.85rem;
@@ -82,6 +127,123 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--bg1) 92%, black);
+}
+
+.home {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.deleted {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg1) 92%, black);
+  overflow: hidden;
+}
+
+.deleted-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.deleted-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.deleted-head h2 {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.deleted-count {
+  min-width: 1.6rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--delete-soft);
+  color: #ffb3af;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.deleted-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.deleted-actions .btn {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.deleted-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.btn.danger {
+  border-color: color-mix(in srgb, var(--delete) 45%, var(--line));
+  background: var(--delete-soft);
+  color: #ffb3af;
+}
+
+.deleted-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.deleted-item:first-child {
+  border-top: 0;
+}
+
+.deleted-meta {
+  min-width: 0;
+  flex: 1;
+}
+
+.deleted-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.98rem;
+  line-height: 1.3;
+}
+
+.deleted-url {
+  display: block;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.8rem;
+  word-break: break-all;
+}
+
+.deleted-url:hover {
+  text-decoration: underline;
+}
+
+.deleted-folder {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.btn.undo {
+  flex-shrink: 0;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
 }
 
 .field {
@@ -129,6 +291,17 @@ select {
 
 .stage {
   margin-top: 1.25rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.stage .hint {
+  margin: 0;
+}
+
+.stage .deck {
+  height: min(52vh, 520px);
+  min-height: 320px;
 }
 
 .stats {
@@ -196,6 +369,10 @@ select {
   left: 1.1rem;
   color: var(--file);
   transform: rotate(-12deg);
+}
+
+.stamp-file.trash {
+  color: var(--delete);
 }
 
 .stamp-delete {
