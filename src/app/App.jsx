@@ -14,6 +14,7 @@ import {
   sourceLabel,
   wait,
 } from "./lib/bookmarks.js";
+import { copy } from "./copy.js";
 
 const emptyStats = { filed: 0, deleted: 0, skipped: 0 };
 
@@ -92,7 +93,7 @@ export default function App() {
         }
       } catch (error) {
         console.error(error);
-        window.alert(`Could not load bookmarks: ${error.message || error}`);
+        window.alert(copy.alerts.loadBookmarksFailed(error.message || error));
       } finally {
         if (!cancelled) {
           deletedReadyRef.current = true;
@@ -151,7 +152,7 @@ export default function App() {
     try {
       await saveSettings();
       if (!destFolderId) {
-        window.alert("Pick a destination.");
+        window.alert(copy.alerts.pickDestination);
         return;
       }
 
@@ -174,7 +175,7 @@ export default function App() {
       setActive(true);
     } catch (error) {
       console.error(error);
-      window.alert(`Failed to start: ${error.message || error}`);
+      window.alert(copy.alerts.startFailed(error.message || error));
     }
   }
 
@@ -215,7 +216,7 @@ export default function App() {
 
   async function restoreDeletedEntry(entry) {
     if (!entry.previousParentId) {
-      throw new Error("Original folder is unknown.");
+      throw new Error(copy.alerts.originalFolderUnknown);
     }
     const created = await browser.bookmarks.create({
       parentId: entry.previousParentId,
@@ -250,7 +251,7 @@ export default function App() {
       }
     } catch (error) {
       console.error(error);
-      window.alert(`Restore failed: ${error.message || error}`);
+      window.alert(copy.alerts.restoreFailed(error.message || error));
     } finally {
       setBusy(false);
     }
@@ -288,7 +289,7 @@ export default function App() {
 
       if (remaining.length > 0) {
         window.alert(
-          `Restored ${restored.length}, but ${remaining.length} failed.`,
+          copy.alerts.restorePartial(restored.length, remaining.length),
         );
       }
     } finally {
@@ -299,7 +300,7 @@ export default function App() {
   function emptyTrash() {
     if (busyRef.current || deletedItems.length === 0) return;
     const confirmed = window.confirm(
-      `Empty trash? This clears ${deletedItems.length} item(s) from the list. Bookmarks already removed stay deleted.`,
+      copy.trash.emptyConfirm(deletedItems.length),
     );
     if (!confirmed) return;
 
@@ -350,7 +351,9 @@ export default function App() {
       setFlyAction(null);
     } catch (error) {
       console.error(error);
-      window.alert(`Could not ${action} bookmark: ${error.message || error}`);
+      window.alert(
+        copy.alerts.actionFailed(action, error.message || error),
+      );
       setFlyAction(null);
     } finally {
       setBusy(false);
@@ -389,7 +392,7 @@ export default function App() {
       }
     } catch (error) {
       console.error(error);
-      window.alert(`Undo failed: ${error.message || error}`);
+      window.alert(copy.alerts.undoFailed(error.message || error));
       undoStackRef.current.push(last);
     } finally {
       setBusy(false);
@@ -408,7 +411,7 @@ export default function App() {
         <div className="top-row">
           <div className="brand">
             <span className="brand-mark" aria-hidden="true" />
-            <h1>Sortega</h1>
+            <h1>{copy.brand}</h1>
           </div>
           {active ? (
             <button
@@ -416,24 +419,24 @@ export default function App() {
               className="btn home"
               onClick={resetToSetup}
               disabled={busy}
-              title="Back to start"
+              title={copy.home.titleTooltip}
             >
-              Home
+              {copy.home.title}
             </button>
           ) : null}
         </div>
         <p className="tagline">
           {destIsTrash
-            ? "Swipe right to delete · down to skip"
-            : "Swipe left to delete · right to file"}
+            ? copy.tagline.trashDestination
+            : copy.tagline.folderDestination}
         </p>
         {active ? (
-          <p className="route" aria-label="Session path">
+          <p className="route" aria-label={copy.route.ariaLabel}>
             <span className="route-from">
               {sourceLabel(sourceFolderId, folders)}
             </span>
             <span className="route-arrow" aria-hidden="true">
-              →
+              {copy.route.arrow}
             </span>
             <span className="route-to">
               {destinationLabel(destFolderId, folders)}

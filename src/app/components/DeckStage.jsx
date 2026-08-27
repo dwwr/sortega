@@ -1,5 +1,6 @@
 import BookmarkCard from "./BookmarkCard.jsx";
 import DeletedList from "./DeletedList.jsx";
+import { copy } from "../copy.js";
 
 export default function DeckStage({
   queue,
@@ -15,23 +16,23 @@ export default function DeckStage({
   onEmptyTrash,
 }) {
   const visible = queue.slice(0, 2);
-  const sendLabel = destIsTrash ? "Delete" : "File";
+  const sendLabel = destIsTrash ? copy.deck.delete : copy.deck.file;
 
   return (
     <main className="stage">
       <div className="stats">
-        <span>{queue.length} left</span>
+        <span>{copy.deck.left(queue.length)}</span>
         <span>
-          {stats.filed} filed · {stats.deleted} deleted · {stats.skipped} skipped
+          {copy.deck.stats(stats.filed, stats.deleted, stats.skipped)}
         </span>
       </div>
 
       <div className="deck" aria-live="polite">
         {queue.length === 0 ? (
           <div className="empty">
-            <p>Deck clear.</p>
+            <p>{copy.deck.emptyTitle}</p>
             <button type="button" className="btn" onClick={onReset}>
-              Back to setup
+              {copy.deck.backToSetup}
             </button>
           </div>
         ) : (
@@ -57,26 +58,26 @@ export default function DeckStage({
           <button
             type="button"
             className="fab delete"
-            title="Delete (←)"
+            title={copy.deck.deleteTooltip}
             onClick={() => onAction("delete")}
             disabled={busy || queue.length === 0}
           >
-            Delete
+            {copy.deck.delete}
           </button>
         ) : null}
         <button
           type="button"
           className="fab skip"
-          title="Skip (↓)"
+          title={copy.deck.skipTooltip}
           onClick={() => onAction("skip")}
           disabled={busy || queue.length === 0}
         >
-          Skip
+          {copy.deck.skip}
         </button>
         <button
           type="button"
           className={`fab ${destIsTrash ? "delete" : "file"}`}
-          title={`${sendLabel} (→)`}
+          title={copy.deck.sendTooltip(sendLabel)}
           onClick={() => onAction("file")}
           disabled={busy || queue.length === 0}
         >
@@ -84,10 +85,7 @@ export default function DeckStage({
         </button>
       </div>
 
-      <p className="hint">
-        Drag the card, use the buttons, or arrow keys. Esc undoes the last
-        action.
-      </p>
+      <p className="hint">{copy.deck.hint}</p>
 
       <DeletedList
         items={deletedItems}
