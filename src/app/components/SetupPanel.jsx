@@ -1,4 +1,5 @@
 import { DEST_TRASH } from "../lib/bookmarks.js";
+import { copy } from "../copy.js";
 import DeletedList from "./DeletedList.jsx";
 
 export default function SetupPanel({
@@ -19,15 +20,15 @@ export default function SetupPanel({
 
   return (
     <div className="home">
-      <section className="controls" aria-label="Session setup">
+      <section className="controls" aria-label={copy.setup.ariaLabel}>
         <label className="field">
-          <span>From</span>
+          <span>{copy.setup.fromLabel}</span>
           <select
             value={sourceFolderId}
             onChange={(event) => onSourceChange(event.target.value)}
             disabled={loading}
           >
-            <option value="all">All bookmarks</option>
+            <option value="all">{copy.setup.allBookmarks}</option>
             {folders.map((folder) => (
               <option key={folder.id} value={folder.id}>
                 {folder.path}
@@ -37,13 +38,13 @@ export default function SetupPanel({
         </label>
 
         <label className="field">
-          <span>Destination</span>
+          <span>{copy.setup.destinationLabel}</span>
           <select
             value={destFolderId}
             onChange={(event) => onDestChange(event.target.value)}
             disabled={loading}
           >
-            <option value={DEST_TRASH}>Trash (delete)</option>
+            <option value={DEST_TRASH}>{copy.setup.trashOption}</option>
             {folders.map((folder) => (
               <option key={folder.id} value={folder.id}>
                 {folder.path}
@@ -58,7 +59,7 @@ export default function SetupPanel({
           onClick={onStart}
           disabled={!canStart || loading}
         >
-          Start deck
+          {copy.setup.startDeck}
         </button>
       </section>
 

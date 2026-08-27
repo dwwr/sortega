@@ -101,6 +101,7 @@ src/
     App.jsx
     components/           # UI + *.stories.jsx
     stories/fixtures.js
+    copy.js               # all user-facing strings
     lib/
     styles.css
 .storybook/               # Storybook config

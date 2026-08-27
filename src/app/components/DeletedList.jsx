@@ -1,3 +1,5 @@
+import { copy } from "../copy.js";
+
 export default function DeletedList({
   items,
   onRestore,
@@ -8,10 +10,10 @@ export default function DeletedList({
   if (items.length === 0) return null;
 
   return (
-    <section className="deleted" aria-label="Trash">
+    <section className="deleted" aria-label={copy.trash.ariaLabel}>
       <div className="deleted-head">
         <div className="deleted-title-row">
-          <h2>Trash</h2>
+          <h2>{copy.trash.title}</h2>
           <span className="deleted-count">{items.length}</span>
         </div>
         <div className="deleted-actions">
@@ -20,18 +22,18 @@ export default function DeletedList({
             className="btn undo"
             onClick={onRestoreAll}
             disabled={busy}
-            title="Restore every item to its original folder"
+            title={copy.trash.restoreAllTooltip}
           >
-            Restore all
+            {copy.trash.restoreAll}
           </button>
           <button
             type="button"
             className="btn danger"
             onClick={onEmptyTrash}
             disabled={busy}
-            title="Permanently clear this list"
+            title={copy.trash.emptyTrashTooltip}
           >
-            Empty trash
+            {copy.trash.emptyTrash}
           </button>
         </div>
       </div>
@@ -57,9 +59,9 @@ export default function DeletedList({
               className="btn undo"
               onClick={() => onRestore(item.logId)}
               disabled={busy}
-              title="Restore to original folder"
+              title={copy.trash.restoreTooltip}
             >
-              Restore
+              {copy.trash.restore}
             </button>
           </li>
         ))}

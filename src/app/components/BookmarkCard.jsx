@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { faviconUrl, hostnameOf, SWIPE_THRESHOLD } from "../lib/bookmarks.js";
+import { copy } from "../copy.js";
 
 export default function BookmarkCard({
   bookmark,
@@ -124,10 +125,10 @@ export default function BookmarkCard({
         className={`stamp stamp-file${destIsTrash ? " trash" : ""}`}
         style={{ opacity: fileOpacity }}
       >
-        {destIsTrash ? "Trash" : "File"}
+        {destIsTrash ? copy.card.stampTrash : copy.card.stampFile}
       </div>
       <div className="stamp stamp-delete" style={{ opacity: deleteOpacity }}>
-        Delete
+        {copy.card.stampDelete}
       </div>
 
       <div className="preview">
@@ -142,7 +143,7 @@ export default function BookmarkCard({
           />
         ) : (
           <div className="favicon-fallback" aria-hidden="true">
-            {(host || "?").slice(0, 1).toUpperCase()}
+            {(host || copy.card.unknownHostInitial).slice(0, 1).toUpperCase()}
           </div>
         )}
         {host ? <p className="preview-host">{host}</p> : null}

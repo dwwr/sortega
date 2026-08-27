@@ -1,3 +1,5 @@
+import { copy } from "../copy.js";
+
 export const STORAGE_KEY = "sortega.settings.v1";
 export const DELETED_STORAGE_KEY = "sortega.deleted.v1";
 export const SWIPE_THRESHOLD = 120;
@@ -9,13 +11,13 @@ export function isTrashDestination(destId) {
 }
 
 export function sourceLabel(sourceId, folders) {
-  if (sourceId === "all") return "All bookmarks";
-  return folders.find((f) => f.id === sourceId)?.path || "Unknown folder";
+  if (sourceId === "all") return copy.folders.allBookmarks;
+  return folders.find((f) => f.id === sourceId)?.path || copy.folders.unknown;
 }
 
 export function destinationLabel(destId, folders) {
-  if (isTrashDestination(destId)) return "Trash (delete)";
-  return folders.find((f) => f.id === destId)?.path || "Unknown folder";
+  if (isTrashDestination(destId)) return copy.folders.trashOption;
+  return folders.find((f) => f.id === destId)?.path || copy.folders.unknown;
 }
 
 
@@ -48,13 +50,17 @@ export function flattenBookmarks(
         title: node.title || node.url,
         url: node.url,
         parentId: node.parentId || folderId,
-        folderPath: folderPath || "Bookmarks",
+        folderPath: folderPath || copy.folders.rootFallback,
       });
     } else if (node.children) {
       const path = folderPath
         ? `${folderPath} / ${node.title}`
-        : node.title || "Bookmarks";
-      folderList.push({ id: node.id, title: node.title || "Folder", path });
+        : node.title || copy.folders.rootFallback;
+      folderList.push({
+        id: node.id,
+        title: node.title || copy.folders.untitledFolder,
+        path,
+      });
       flattenBookmarks(node.children, path, node.id, out, folderList);
     }
   }
