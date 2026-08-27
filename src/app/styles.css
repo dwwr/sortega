@@ -47,10 +47,24 @@ body {
   margin-bottom: 1.25rem;
 }
 
+.top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
 .brand {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  min-width: 0;
+}
+
+.btn.home {
+  flex-shrink: 0;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
 }
 
 .brand-mark {
@@ -73,6 +87,37 @@ body {
   margin: 0.35rem 0 0;
   color: var(--muted);
   font-size: 0.95rem;
+}
+
+.route {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.55rem;
+  margin: 0.85rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--bg1) 88%, black);
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.route-from,
+.route-to {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.route-to {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.route-arrow {
+  color: var(--muted);
+  flex-shrink: 0;
 }
 
 .controls {

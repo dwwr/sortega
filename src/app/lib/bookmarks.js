@@ -7,6 +7,16 @@ export function isTrashDestination(destId) {
   return destId === DEST_TRASH;
 }
 
+export function sourceLabel(sourceId, folders) {
+  if (sourceId === "all") return "All bookmarks";
+  return folders.find((f) => f.id === sourceId)?.path || "Unknown folder";
+}
+
+export function destinationLabel(destId, folders) {
+  if (isTrashDestination(destId)) return "Trash (delete)";
+  return folders.find((f) => f.id === destId)?.path || "Unknown folder";
+}
+
 
 export function hostnameOf(url) {
   try {

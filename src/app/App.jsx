@@ -6,9 +6,11 @@ import {
   STORAGE_KEY,
   DEST_TRASH,
   bookmarksForSource,
+  destinationLabel,
   flattenBookmarks,
   isTrashDestination,
   shuffle,
+  sourceLabel,
   wait,
 } from "./lib/bookmarks.js";
 
@@ -263,15 +265,41 @@ export default function App() {
   return (
     <div className="shell">
       <header className="top">
-        <div className="brand">
-          <span className="brand-mark" aria-hidden="true" />
-          <h1>Sortega</h1>
+        <div className="top-row">
+          <div className="brand">
+            <span className="brand-mark" aria-hidden="true" />
+            <h1>Sortega</h1>
+          </div>
+          {active ? (
+            <button
+              type="button"
+              className="btn home"
+              onClick={resetToSetup}
+              disabled={busy}
+              title="Back to start"
+            >
+              Home
+            </button>
+          ) : null}
         </div>
         <p className="tagline">
           {destIsTrash
             ? "Swipe right to delete · down to skip"
             : "Swipe left to delete · right to file"}
         </p>
+        {active ? (
+          <p className="route" aria-label="Session path">
+            <span className="route-from">
+              {sourceLabel(sourceFolderId, folders)}
+            </span>
+            <span className="route-arrow" aria-hidden="true">
+              →
+            </span>
+            <span className="route-to">
+              {destinationLabel(destFolderId, folders)}
+            </span>
+          </p>
+        ) : null}
       </header>
 
       {!active ? (
