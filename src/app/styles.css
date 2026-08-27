@@ -133,7 +133,7 @@ body::before {
 
 .brand h1 {
   margin: 0;
-  font-family: var(--font);
+  font-family: var(--ui);
   font-size: clamp(2rem, 5vw, 2.7rem);
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -585,10 +585,11 @@ select:focus {
 
 .title {
   margin: 0 0 0.35rem;
-  font-family: var(--font);
+  font-family: var(--ui);
   font-size: 1.35rem;
   line-height: 1.25;
   letter-spacing: -0.02em;
+  font-weight: 600;
 }
 
 .url {

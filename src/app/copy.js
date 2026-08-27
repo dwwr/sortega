@@ -14,7 +14,7 @@ export const copy = {
 
   tagline: {
     trashDestination: "Swipe right to delete · down to skip",
-    folderDestination: "Swipe left to delete · right to file",
+    folderDestination: "Swipe left to delete · right to keep",
   },
 
   route: {
@@ -49,14 +49,14 @@ export const copy = {
     deleteTooltip: "Delete (←)",
     skip: "Skip",
     skipTooltip: "Skip (↓)",
-    file: "File",
+    file: "Keep",
     sendTooltip: (label) => `${label} (→)`,
     hint: "Drag the card, use the buttons, or arrow keys. Esc undoes the last action.",
   },
 
   card: {
     stampTrash: "Trash",
-    stampFile: "File",
+    stampFile: "Keep",
     stampDelete: "Delete",
     unknownHostInitial: "?",
   },
