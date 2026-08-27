@@ -50,13 +50,13 @@ Watching → dist/chrome/app
 
 await viteBuild({
   configFile: join(root, "vite.config.js"),
+  mode: "extension",
+  logLevel: "warn",
   build: {
     outDir: join(chromeDir, "app"),
     emptyOutDir: true,
     sourcemap: true,
     watch: {
-      // Avoid watching node_modules / dist (Vite defaults are usually fine;
-      // chokidar options help on low FD limits).
       chokidar: {
         ignoreInitial: true,
         awaitWriteFinish: { stabilityThreshold: 120, pollInterval: 50 },

@@ -22,7 +22,11 @@ function newLogId() {
   return crypto.randomUUID();
 }
 
-export default function App() {
+export default function App({
+  demoBanner = null,
+  demoHeaderAction = null,
+  onActiveChange = null,
+}) {
   const [folders, setFolders] = useState([]);
   const [sourceFolderId, setSourceFolderId] = useState("all");
   const [destFolderId, setDestFolderId] = useState(DEST_TRASH);
@@ -53,6 +57,9 @@ export default function App() {
   useEffect(() => {
     activeRef.current = active;
   }, [active]);
+  useEffect(() => {
+    onActiveChange?.(active);
+  }, [active, onActiveChange]);
   useEffect(() => {
     destRef.current = destFolderId;
   }, [destFolderId]);
@@ -407,23 +414,27 @@ export default function App() {
 
   return (
     <div className="shell">
+      {demoBanner}
       <header className="top">
         <div className="top-row">
           <div className="brand">
             <span className="brand-mark" aria-hidden="true" />
             <h1>{copy.brand}</h1>
           </div>
-          {active ? (
-            <button
-              type="button"
-              className="btn home"
-              onClick={resetToSetup}
-              disabled={busy}
-              title={copy.home.titleTooltip}
-            >
-              {copy.home.title}
-            </button>
-          ) : null}
+          <div className="top-actions">
+            {demoHeaderAction}
+            {active ? (
+              <button
+                type="button"
+                className="btn home"
+                onClick={resetToSetup}
+                disabled={busy}
+                title={copy.home.titleTooltip}
+              >
+                {copy.home.title}
+              </button>
+            ) : null}
+          </div>
         </div>
         <p className="tagline">
           {destIsTrash

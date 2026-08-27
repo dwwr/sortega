@@ -1,8 +1,11 @@
 # Sortega
 
-Swipe through browser bookmarks on **Chrome** and **Firefox** (desktop) — file into a folder or delete, Tinder-style.
+Swipe through browser bookmarks on **Chrome** and **Firefox** (desktop) — keep into a folder or delete, Tinder-style.
 
-One React source tree; a Vite build + packaging step emits browser-specific packages under `dist/`.
+This repo serves two purposes:
+
+1. **Browser extension** — one React source tree; a Vite build + packaging step emits Chrome and Firefox packages under `dist/chrome` and `dist/firefox`.
+2. **Hostable demo showcase** — the same UI with mock bookmarks, a demo banner, and an **Open Storybook** link (same pattern as [earf-quake](https://github.com/dwwr/earf-quake) / [ca-llc-field-manual](https://github.com/dwwr/ca-llc-field-manual)). Demo-only chrome lives in a separate Vite entry (`main-demo.jsx`) and never ships in the extension packages.
 
 ## Requirements
 
@@ -13,6 +16,11 @@ One React source tree; a Vite build + packaging step emits browser-specific pack
 
 ```bash
 npm install
+```
+
+## Extension builds
+
+```bash
 npm run build
 ```
 
@@ -40,21 +48,37 @@ This packages `dist/chrome` once, then rebuilds the React app into `dist/chrome/
 2. After UI edits: refresh the Sortega tab (`Cmd/Ctrl+R`)
 3. After background / icon / manifest edits: click **Reload** on `chrome://extensions` (re-run `watch:chrome` or `build:chrome` if icons/manifest changed)
 
-UI-only Vite preview with mock bookmarks (no real extension APIs):
+## Demo showcase (hostable)
+
+Local UI preview with mock bookmarks (no real extension APIs):
 
 ```bash
 npm run dev
 ```
 
-Open the Local URL Vite prints (e.g. `http://localhost:5173/`). The page uses fake bookmarks so layout/swipe work in a normal browser. For real bookmarks, use `watch:chrome` / a packed extension instead.
+Open the Local URL Vite prints (e.g. `http://localhost:5173/`). You’ll see a demo banner and an amber **Open Storybook** pill. For Storybook in that link during local preview, run `npm run storybook` in a second terminal (Vite proxies `./storybook/` → `:6006`).
 
-### Storybook
+Production static site (app + nested Storybook):
+
+```bash
+npm run build:demo
+```
+
+Output: `dist/demo/` (index + assets) and `dist/demo/storybook/`. Host that folder on any static host (GitHub Pages, Netlify, S3, etc.). Preview locally:
+
+```bash
+npm run preview:demo
+```
+
+Demo-only UI (banner + Storybook CTA) is **not** included in extension builds.
+
+### Storybook alone
 
 ```bash
 npm run storybook
 ```
 
-Opens component stories for `BookmarkCard`, `SetupPanel`, `DeletedList`, and `DeckStage` (with shared fixtures under `src/app/stories/`).
+Component stories for `BookmarkCard`, `SetupPanel`, `DeletedList`, and `DeckStage` (fixtures under `src/app/stories/`).
 
 ## Load unpacked (Chrome)
 
@@ -102,15 +126,20 @@ src/
     components/           # UI + *.stories.jsx
     stories/fixtures.js
     copy.js               # all user-facing strings
+    demoCopy.js / demo.css / DemoExtras.jsx / main-demo.jsx  # demo-only
+    demo.html             # demo Vite entry (→ index.html in dist/demo)
     lib/
+      browser-mock.js     # mock bookmarks for demo / Storybook
     styles.css
 .storybook/               # Storybook config
-vite.config.js
-scripts/build.mjs         # Vite bundle + per-browser package
-dist/chrome|firefox/      # generated packages (gitignored)
+vite.config.js            # demo vs extension modes
+scripts/build.mjs         # extension packages
+scripts/build-demo.mjs    # hostable demo + storybook
+dist/chrome|firefox/      # extension packages (gitignored)
+dist/demo/                # static demo site (gitignored)
 ```
 
-Cross-browser API calls go through [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill) (bundled into the React app; also loaded for the background script on Firefox).
+Cross-browser API calls go through [`webextension-polyfill`](https://github.com/mozilla/webextension-polyfill) (bundled into the React app; also loaded for the background script on Firefox). Demo / `npm run dev` alias the polyfill to the mock and boot via `main-demo.jsx` (banner + Storybook CTA). Extension builds use `main.jsx` only — no demo UI or CSS.
 
 Manifest differences handled at build time:
 
@@ -128,5 +157,5 @@ Manifest differences handled at build time:
 ## Notes
 
 - Desktop only for now. Mobile browsers do not expose a usable bookmarks API for this flow.
-- Deleting bookmarks is real; use **Esc** undo during the session if you mis-swipe.
+- Deleting bookmarks is real in the extension; use **Esc** undo during the session if you mis-swipe.
 - Change the Firefox add-on id in `src/manifest.base.json` before publishing to AMO.

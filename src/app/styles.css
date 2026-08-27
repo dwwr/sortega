@@ -111,6 +111,15 @@ body::before {
   gap: 1rem;
 }
 
+.top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
 .brand {
   display: flex;
   align-items: center;

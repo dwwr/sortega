@@ -1,0 +1,50 @@
+.demo-banner {
+  margin: 0 0 1.15rem;
+  padding: 0.95rem 1.1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 251, 235, 0.78), rgba(254, 243, 199, 0.55));
+  box-shadow: var(--specular), 0 8px 24px rgba(146, 64, 14, 0.1);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+.demo-banner-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.demo-banner-body {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: rgba(120, 53, 15, 0.92);
+  font-weight: 500;
+}
+
+.storybook-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fcd34d;
+  color: #0f172a;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(146, 64, 14, 0.18);
+  transition: filter 0.18s ease, transform 0.18s ease;
+}
+
+.storybook-cta:hover {
+  filter: brightness(1.05);
+  background: #fde68a;
+}
+
+.storybook-cta:active {
+  transform: scale(0.98);
+}
