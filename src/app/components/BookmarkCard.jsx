@@ -92,17 +92,18 @@ export default function BookmarkCard({
     ? undefined
     : `translate(${offset.x}px, ${offset.y}px) rotate(${offset.x / 18}deg)`;
 
-  const style = behind
-    ? undefined
-    : {
-        transform,
-        opacity: flyAction ? 0 : 1,
-        transition: dragging
-          ? "none"
-          : animating || flyAction
-            ? "transform 0.28s ease, opacity 0.28s ease"
-            : "box-shadow 0.2s ease",
-      };
+  // At rest, leave transform/opacity to CSS so promoting from `.behind`
+  // can transition. Inline styles only while dragging / flying / snapping back.
+  const style =
+    behind || !(dragging || animating || flyAction)
+      ? undefined
+      : {
+          transform,
+          opacity: flyAction ? 0 : 1,
+          transition: dragging
+            ? "none"
+            : "transform 0.28s ease, opacity 0.28s ease",
+        };
 
   return (
     <article

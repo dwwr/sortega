@@ -480,11 +480,16 @@ select:focus {
   user-select: none;
   cursor: grab;
   transform-origin: 50% 110%;
-  transition: box-shadow 0.2s ease;
   /* Opaque on extension pages where backdrop-filter is unreliable. */
   background: #ffffff;
   border: 1px solid var(--glass-edge-soft);
   box-shadow: var(--glass-shadow), var(--specular);
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.34s ease,
+    background 0.34s ease,
+    box-shadow 0.34s ease,
+    filter 0.34s ease;
 }
 
 .card:active {
@@ -548,6 +553,7 @@ select:focus {
   background: #f3f7fc;
   overflow: hidden;
   text-align: center;
+  transition: background 0.34s ease;
 }
 
 .card.behind .preview {
@@ -600,6 +606,7 @@ select:focus {
   padding: 1.05rem 1.2rem 1.2rem;
   border-top: 1px solid #e8eef5;
   background: #ffffff;
+  transition: background 0.34s ease, border-color 0.34s ease;
 }
 
 .card.behind .meta {
