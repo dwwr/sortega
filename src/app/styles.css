@@ -198,6 +198,10 @@ select {
   transform: rotate(-12deg);
 }
 
+.stamp-file.trash {
+  color: var(--delete);
+}
+
 .stamp-delete {
   right: 1.1rem;
   color: var(--delete);

@@ -40,11 +40,13 @@ This packages `dist/chrome` once, then rebuilds the React app into `dist/chrome/
 2. After UI edits: refresh the Sortega tab (`Cmd/Ctrl+R`)
 3. After background / icon / manifest edits: click **Reload** on `chrome://extensions` (re-run `watch:chrome` or `build:chrome` if icons/manifest changed)
 
-UI-only Vite dev server (no bookmark API outside an extension page):
+UI-only Vite preview with mock bookmarks (no real extension APIs):
 
 ```bash
 npm run dev
 ```
+
+Open the Local URL Vite prints (e.g. `http://localhost:5173/`). The page uses fake bookmarks so layout/swipe work in a normal browser. For real bookmarks, use `watch:chrome` / a packed extension instead.
 
 ## Load unpacked (Chrome)
 
@@ -65,11 +67,11 @@ npm run dev
 ## How to use
 
 1. Choose a **From** folder (or all bookmarks)
-2. Choose **File into** — the destination folder for right-swipes
+2. Choose **Destination** — `Trash (delete)` (default) or a folder for right-swipes
 3. **Start deck**
 4. For each card:
-   - **← / Delete** — remove the bookmark
-   - **→ / File** — move it into the destination folder
+   - **→** — send to destination (delete if Trash, otherwise move into the folder)
+   - **← / Delete** — delete (only shown when destination is a folder)
    - **↓ / Skip** — leave it where it is and go to the next
    - **Esc** — undo the last action in this session
 

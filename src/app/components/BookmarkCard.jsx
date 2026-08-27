@@ -6,6 +6,7 @@ export default function BookmarkCard({
   behind = false,
   busy = false,
   flyAction = null,
+  destIsTrash = false,
   onSwipe,
 }) {
   const cardRef = useRef(null);
@@ -119,8 +120,11 @@ export default function BookmarkCard({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
-      <div className="stamp stamp-file" style={{ opacity: fileOpacity }}>
-        File
+      <div
+        className={`stamp stamp-file${destIsTrash ? " trash" : ""}`}
+        style={{ opacity: fileOpacity }}
+      >
+        {destIsTrash ? "Trash" : "File"}
       </div>
       <div className="stamp stamp-delete" style={{ opacity: deleteOpacity }}>
         Delete

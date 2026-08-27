@@ -4,8 +4,10 @@ import SetupPanel from "./components/SetupPanel.jsx";
 import DeckStage from "./components/DeckStage.jsx";
 import {
   STORAGE_KEY,
+  DEST_TRASH,
   bookmarksForSource,
   flattenBookmarks,
+  isTrashDestination,
   shuffle,
   wait,
 } from "./lib/bookmarks.js";
@@ -15,7 +17,7 @@ const emptyStats = { filed: 0, deleted: 0, skipped: 0 };
 export default function App() {
   const [folders, setFolders] = useState([]);
   const [sourceFolderId, setSourceFolderId] = useState("all");
-  const [destFolderId, setDestFolderId] = useState("");
+  const [destFolderId, setDestFolderId] = useState(DEST_TRASH);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(false);
   const [queue, setQueue] = useState([]);
@@ -29,6 +31,8 @@ export default function App() {
   const activeRef = useRef(active);
   const destRef = useRef(destFolderId);
   const flyActionRef = useRef(flyAction);
+
+  const destIsTrash = isTrashDestination(destFolderId);
 
   useEffect(() => {
     queueRef.current = queue;
@@ -63,12 +67,12 @@ export default function App() {
         const sourceOk =
           settings.sourceFolderId === "all" ||
           flat.folders.some((f) => f.id === settings.sourceFolderId);
-        const destOk = flat.folders.some((f) => f.id === settings.destFolderId);
+        const destOk =
+          isTrashDestination(settings.destFolderId) ||
+          flat.folders.some((f) => f.id === settings.destFolderId);
 
         setSourceFolderId(sourceOk ? settings.sourceFolderId : "all");
-        setDestFolderId(
-          destOk ? settings.destFolderId : flat.folders[0]?.id || "",
-        );
+        setDestFolderId(destOk ? settings.destFolderId : DEST_TRASH);
       } catch (error) {
         console.error(error);
         window.alert(`Could not load bookmarks: ${error.message || error}`);
@@ -88,7 +92,9 @@ export default function App() {
       if (!activeRef.current) return;
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        resolveAction("delete");
+        if (!isTrashDestination(destRef.current)) {
+          resolveAction("delete");
+        }
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
         resolveAction("file");
@@ -118,7 +124,7 @@ export default function App() {
     try {
       await saveSettings();
       if (!destFolderId) {
-        window.alert("Pick a destination folder to file bookmarks into.");
+        window.alert("Pick a destination.");
         return;
       }
 
@@ -127,9 +133,12 @@ export default function App() {
       const { bookmarks, folders: nextFolders } = flattenBookmarks(roots);
       setFolders(nextFolders);
 
-      const nextQueue = shuffle(
+      let nextQueue = shuffle(
         bookmarksForSource(bookmarks, nextFolders, sourceFolderId),
-      ).filter((b) => b.parentId !== destFolderId);
+      );
+      if (!isTrashDestination(destFolderId)) {
+        nextQueue = nextQueue.filter((b) => b.parentId !== destFolderId);
+      }
 
       undoStackRef.current = [];
       setStats(emptyStats);
@@ -142,6 +151,22 @@ export default function App() {
     }
   }
 
+  async function deleteBookmark(bookmark) {
+    const before = await browser.bookmarks.get(bookmark.id);
+    await browser.bookmarks.remove(bookmark.id);
+    undoStackRef.current.push({
+      type: "delete",
+      bookmark: {
+        ...bookmark,
+        title: before[0]?.title || bookmark.title,
+        url: before[0]?.url || bookmark.url,
+      },
+      previousParentId: before[0]?.parentId,
+      previousIndex: before[0]?.index,
+    });
+    setStats((s) => ({ ...s, deleted: s.deleted + 1 }));
+  }
+
   async function resolveAction(action) {
     if (busyRef.current || flyActionRef.current || queueRef.current.length === 0) {
       return;
@@ -149,39 +174,36 @@ export default function App() {
 
     const bookmark = queueRef.current[0];
     const dest = destRef.current;
+    const trashDest = isTrashDestination(dest);
     setBusy(true);
+
+    // Keep fly direction aligned with the gesture/button, even when
+    // destination Trash turns a "file" action into a delete.
+    let fly = action;
 
     try {
       if (action === "file") {
-        const before = await browser.bookmarks.get(bookmark.id);
-        await browser.bookmarks.move(bookmark.id, { parentId: dest });
-        undoStackRef.current.push({
-          type: "file",
-          bookmark,
-          previousParentId: before[0]?.parentId,
-          previousIndex: before[0]?.index,
-        });
-        setStats((s) => ({ ...s, filed: s.filed + 1 }));
+        if (trashDest) {
+          await deleteBookmark(bookmark);
+        } else {
+          const before = await browser.bookmarks.get(bookmark.id);
+          await browser.bookmarks.move(bookmark.id, { parentId: dest });
+          undoStackRef.current.push({
+            type: "file",
+            bookmark,
+            previousParentId: before[0]?.parentId,
+            previousIndex: before[0]?.index,
+          });
+          setStats((s) => ({ ...s, filed: s.filed + 1 }));
+        }
       } else if (action === "delete") {
-        const before = await browser.bookmarks.get(bookmark.id);
-        await browser.bookmarks.remove(bookmark.id);
-        undoStackRef.current.push({
-          type: "delete",
-          bookmark: {
-            ...bookmark,
-            title: before[0]?.title || bookmark.title,
-            url: before[0]?.url || bookmark.url,
-          },
-          previousParentId: before[0]?.parentId,
-          previousIndex: before[0]?.index,
-        });
-        setStats((s) => ({ ...s, deleted: s.deleted + 1 }));
+        await deleteBookmark(bookmark);
       } else {
         undoStackRef.current.push({ type: "skip", bookmark });
         setStats((s) => ({ ...s, skipped: s.skipped + 1 }));
       }
 
-      setFlyAction(action);
+      setFlyAction(fly);
       await wait(280);
       setQueue((q) => q.slice(1));
       setFlyAction(null);
@@ -245,7 +267,11 @@ export default function App() {
           <span className="brand-mark" aria-hidden="true" />
           <h1>Sortega</h1>
         </div>
-        <p className="tagline">Swipe left to delete · right to file</p>
+        <p className="tagline">
+          {destIsTrash
+            ? "Swipe right to delete · down to skip"
+            : "Swipe left to delete · right to file"}
+        </p>
       </header>
 
       {!active ? (
@@ -270,6 +296,7 @@ export default function App() {
           stats={stats}
           busy={busy}
           flyAction={flyAction}
+          destIsTrash={destIsTrash}
           onAction={resolveAction}
           onReset={resetToSetup}
         />

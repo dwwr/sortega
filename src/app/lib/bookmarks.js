@@ -1,5 +1,12 @@
 export const STORAGE_KEY = "sortega.settings.v1";
 export const SWIPE_THRESHOLD = 120;
+/** Sentinel destination id — not a real bookmark folder. */
+export const DEST_TRASH = "__trash__";
+
+export function isTrashDestination(destId) {
+  return destId === DEST_TRASH;
+}
+
 
 export function hostnameOf(url) {
   try {

@@ -1,3 +1,5 @@
+import { DEST_TRASH } from "../lib/bookmarks.js";
+
 export default function SetupPanel({
   folders,
   sourceFolderId,
@@ -7,7 +9,7 @@ export default function SetupPanel({
   onStart,
   loading,
 }) {
-  const canStart = folders.length > 0 && Boolean(destFolderId);
+  const canStart = Boolean(destFolderId);
 
   return (
     <section className="controls" aria-label="Session setup">
@@ -28,21 +30,18 @@ export default function SetupPanel({
       </label>
 
       <label className="field">
-        <span>File into</span>
+        <span>Destination</span>
         <select
           value={destFolderId}
           onChange={(event) => onDestChange(event.target.value)}
-          disabled={loading || folders.length === 0}
+          disabled={loading}
         >
-          {folders.length === 0 ? (
-            <option value="">No folders found</option>
-          ) : (
-            folders.map((folder) => (
-              <option key={folder.id} value={folder.id}>
-                {folder.path}
-              </option>
-            ))
-          )}
+          <option value={DEST_TRASH}>Trash (delete)</option>
+          {folders.map((folder) => (
+            <option key={folder.id} value={folder.id}>
+              {folder.path}
+            </option>
+          ))}
         </select>
       </label>
 

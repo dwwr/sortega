@@ -5,10 +5,12 @@ export default function DeckStage({
   stats,
   busy,
   flyAction,
+  destIsTrash,
   onAction,
   onReset,
 }) {
   const visible = queue.slice(0, 2);
+  const sendLabel = destIsTrash ? "Delete" : "File";
 
   return (
     <main className="stage">
@@ -37,6 +39,7 @@ export default function DeckStage({
                 behind={!isTop}
                 busy={busy}
                 flyAction={isTop ? flyAction : null}
+                destIsTrash={destIsTrash}
                 onSwipe={isTop ? onAction : undefined}
               />
             );
@@ -45,15 +48,17 @@ export default function DeckStage({
       </div>
 
       <div className="actions">
-        <button
-          type="button"
-          className="fab delete"
-          title="Delete (←)"
-          onClick={() => onAction("delete")}
-          disabled={busy || queue.length === 0}
-        >
-          Delete
-        </button>
+        {!destIsTrash ? (
+          <button
+            type="button"
+            className="fab delete"
+            title="Delete (←)"
+            onClick={() => onAction("delete")}
+            disabled={busy || queue.length === 0}
+          >
+            Delete
+          </button>
+        ) : null}
         <button
           type="button"
           className="fab skip"
@@ -65,12 +70,12 @@ export default function DeckStage({
         </button>
         <button
           type="button"
-          className="fab file"
-          title="File (→)"
+          className={`fab ${destIsTrash ? "delete" : "file"}`}
+          title={`${sendLabel} (→)`}
           onClick={() => onAction("file")}
           disabled={busy || queue.length === 0}
         >
-          File
+          {sendLabel}
         </button>
       </div>
 
