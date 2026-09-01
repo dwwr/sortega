@@ -1,5 +1,6 @@
 import BookmarkCard from "./BookmarkCard.jsx";
 import DeletedList from "./DeletedList.jsx";
+import MovedList from "./MovedList.jsx";
 import { copy } from "../copy.js";
 
 export default function DeckStage({
@@ -9,11 +10,15 @@ export default function DeckStage({
   flyAction,
   destIsTrash,
   deletedItems,
+  movedItems = [],
   onAction,
   onReset,
   onUndoDelete,
   onRestoreAll,
   onEmptyTrash,
+  onUndoMove,
+  onUndoAllMoves,
+  onDismissMoved,
 }) {
   const visible = queue.slice(0, 2);
   const leftLabel = destIsTrash ? copy.deck.delete : copy.deck.stay;
@@ -100,6 +105,14 @@ export default function DeckStage({
         onRestore={onUndoDelete}
         onRestoreAll={onRestoreAll}
         onEmptyTrash={onEmptyTrash}
+        busy={busy}
+      />
+
+      <MovedList
+        items={movedItems}
+        onUndo={onUndoMove}
+        onUndoAll={onUndoAllMoves}
+        onDismissAll={onDismissMoved}
         busy={busy}
       />
     </main>

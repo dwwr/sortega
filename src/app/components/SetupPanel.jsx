@@ -1,6 +1,7 @@
 import { DEST_TRASH } from "../lib/bookmarks.js";
 import { copy } from "../copy.js";
 import DeletedList from "./DeletedList.jsx";
+import MovedList from "./MovedList.jsx";
 
 export default function SetupPanel({
   folders,
@@ -11,9 +12,13 @@ export default function SetupPanel({
   onStart,
   loading,
   deletedItems,
+  movedItems = [],
   onUndoDelete,
   onRestoreAll,
   onEmptyTrash,
+  onUndoMove,
+  onUndoAllMoves,
+  onDismissMoved,
   undoBusy,
 }) {
   const canStart = Boolean(destFolderId);
@@ -68,6 +73,14 @@ export default function SetupPanel({
         onRestore={onUndoDelete}
         onRestoreAll={onRestoreAll}
         onEmptyTrash={onEmptyTrash}
+        busy={undoBusy}
+      />
+
+      <MovedList
+        items={movedItems}
+        onUndo={onUndoMove}
+        onUndoAll={onUndoAllMoves}
+        onDismissAll={onDismissMoved}
         busy={undoBusy}
       />
     </div>

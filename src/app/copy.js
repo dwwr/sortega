@@ -83,6 +83,19 @@ export const copy = {
       `Empty trash? This clears ${count} item(s) from the list. Bookmarks already removed stay deleted.`,
   },
 
+  moves: {
+    title: "Moved",
+    ariaLabel: "Moved bookmarks",
+    undoAll: "Undo all",
+    undoAllTooltip: "Move every item back to its original folder",
+    dismissAll: "Dismiss list",
+    dismissAllTooltip: "Clear this list without moving bookmarks",
+    undo: "Undo",
+    undoTooltip: "Move back to original folder",
+    dismissConfirm: (count) =>
+      `Dismiss the moved list? ${count} bookmark(s) stay in their destination folders.`,
+  },
+
   alerts: {
     loadBookmarksFailed: (detail) => `Could not load bookmarks: ${detail}`,
     pickDestination: "Pick a destination.",
@@ -90,8 +103,11 @@ export const copy = {
     actionFailed: (action, detail) => `Could not ${action} bookmark: ${detail}`,
     undoFailed: (detail) => `Undo failed: ${detail}`,
     restoreFailed: (detail) => `Restore failed: ${detail}`,
+    undoMoveFailed: (detail) => `Undo move failed: ${detail}`,
     restorePartial: (ok, failed) =>
       `Restored ${ok}, but ${failed} failed.`,
+    undoMovePartial: (ok, failed) =>
+      `Moved back ${ok}, but ${failed} failed.`,
     originalFolderUnknown: "Original folder is unknown.",
   },
 };

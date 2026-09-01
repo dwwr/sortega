@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { fn } from "storybook/test";
 import DeckStage from "./DeckStage.jsx";
-import { deckDefaults, deletedItems, queue } from "../stories/fixtures.js";
+import { deckDefaults, deletedItems, movedItems, queue } from "../stories/fixtures.js";
 
 const meta = {
   title: "Components/DeckStage",
@@ -13,6 +13,9 @@ const meta = {
     onUndoDelete: fn(),
     onRestoreAll: fn(),
     onEmptyTrash: fn(),
+    onUndoMove: fn(),
+    onUndoAllMoves: fn(),
+    onDismissMoved: fn(),
   },
 };
 
@@ -24,6 +27,7 @@ export const FolderDestination = {
   args: {
     destIsTrash: false,
     deletedItems: [],
+    movedItems,
   },
 };
 

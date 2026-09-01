@@ -2,6 +2,7 @@ import { copy } from "../copy.js";
 
 export const STORAGE_KEY = "sortega.settings.v1";
 export const DELETED_STORAGE_KEY = "sortega.deleted.v1";
+export const MOVED_STORAGE_KEY = "sortega.moved.v1";
 export const SWIPE_THRESHOLD = 120;
 /** Sentinel destination id — not a real bookmark folder. */
 export const DEST_TRASH = "__trash__";

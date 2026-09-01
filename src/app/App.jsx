@@ -5,6 +5,7 @@ import DeckStage from "./components/DeckStage.jsx";
 import {
   STORAGE_KEY,
   DELETED_STORAGE_KEY,
+  MOVED_STORAGE_KEY,
   DEST_TRASH,
   bookmarksForSource,
   destinationLabel,
@@ -37,6 +38,7 @@ export default function App({
   const [busy, setBusy] = useState(false);
   const [flyAction, setFlyAction] = useState(null);
   const [deletedItems, setDeletedItems] = useState([]);
+  const [movedItems, setMovedItems] = useState([]);
 
   const undoStackRef = useRef([]);
   const queueRef = useRef(queue);
@@ -44,7 +46,7 @@ export default function App({
   const activeRef = useRef(active);
   const destRef = useRef(destFolderId);
   const flyActionRef = useRef(flyAction);
-  const deletedReadyRef = useRef(false);
+  const storageReadyRef = useRef(false);
 
   const destIsTrash = isTrashDestination(destFolderId);
 
@@ -82,6 +84,7 @@ export default function App({
         const saved = await browser.storage.local.get([
           STORAGE_KEY,
           DELETED_STORAGE_KEY,
+          MOVED_STORAGE_KEY,
         ]);
         const settings = saved[STORAGE_KEY] || {};
         const sourceOk =
@@ -98,12 +101,17 @@ export default function App({
         if (Array.isArray(storedDeleted)) {
           setDeletedItems(storedDeleted);
         }
+
+        const storedMoved = saved[MOVED_STORAGE_KEY];
+        if (Array.isArray(storedMoved)) {
+          setMovedItems(storedMoved);
+        }
       } catch (error) {
         console.error(error);
         window.alert(copy.alerts.loadBookmarksFailed(error.message || error));
       } finally {
         if (!cancelled) {
-          deletedReadyRef.current = true;
+          storageReadyRef.current = true;
           setLoading(false);
         }
       }
@@ -116,11 +124,18 @@ export default function App({
   }, []);
 
   useEffect(() => {
-    if (!deletedReadyRef.current) return;
+    if (!storageReadyRef.current) return;
     browser.storage.local.set({ [DELETED_STORAGE_KEY]: deletedItems }).catch(
       (error) => console.error(error),
     );
   }, [deletedItems]);
+
+  useEffect(() => {
+    if (!storageReadyRef.current) return;
+    browser.storage.local.set({ [MOVED_STORAGE_KEY]: movedItems }).catch(
+      (error) => console.error(error),
+    );
+  }, [movedItems]);
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -191,6 +206,14 @@ export default function App({
 
   function forgetDeleted(logId) {
     setDeletedItems((items) => items.filter((item) => item.logId !== logId));
+  }
+
+  function rememberMoved(entry) {
+    setMovedItems((items) => [entry, ...items]);
+  }
+
+  function forgetMoved(logId) {
+    setMovedItems((items) => items.filter((item) => item.logId !== logId));
   }
 
   async function deleteBookmark(bookmark) {
@@ -317,6 +340,101 @@ export default function App({
     );
   }
 
+  async function restoreMovedEntry(entry) {
+    if (!entry.previousParentId) {
+      throw new Error(copy.alerts.originalFolderUnknown);
+    }
+    await browser.bookmarks.move(entry.bookmarkId, {
+      parentId: entry.previousParentId,
+      index: entry.previousIndex,
+    });
+    return {
+      id: entry.bookmarkId,
+      title: entry.title,
+      url: entry.url,
+      parentId: entry.previousParentId,
+      folderPath: entry.folderPath || "",
+    };
+  }
+
+  async function undoMoveFromList(logId) {
+    if (busyRef.current) return;
+    const entry = movedItems.find((item) => item.logId === logId);
+    if (!entry) return;
+
+    setBusy(true);
+    try {
+      const restored = await restoreMovedEntry(entry);
+      forgetMoved(logId);
+      undoStackRef.current = undoStackRef.current.filter(
+        (item) => item.logId !== logId,
+      );
+      if (activeRef.current) {
+        setStats((s) => ({ ...s, filed: Math.max(0, s.filed - 1) }));
+        setQueue((q) => [restored, ...q]);
+      }
+    } catch (error) {
+      console.error(error);
+      window.alert(copy.alerts.undoMoveFailed(error.message || error));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function undoAllMoved() {
+    if (busyRef.current || movedItems.length === 0) return;
+    setBusy(true);
+    const pending = [...movedItems];
+    const restored = [];
+    const remaining = [];
+
+    try {
+      for (const entry of pending) {
+        try {
+          restored.push(await restoreMovedEntry(entry));
+          undoStackRef.current = undoStackRef.current.filter(
+            (item) => item.logId !== entry.logId,
+          );
+        } catch (error) {
+          console.error(error);
+          remaining.push(entry);
+        }
+      }
+
+      setMovedItems(remaining);
+
+      if (activeRef.current && restored.length > 0) {
+        setStats((s) => ({
+          ...s,
+          filed: Math.max(0, s.filed - restored.length),
+        }));
+        setQueue((q) => [...restored, ...q]);
+      }
+
+      if (remaining.length > 0) {
+        window.alert(
+          copy.alerts.undoMovePartial(restored.length, remaining.length),
+        );
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function dismissMovedList() {
+    if (busyRef.current || movedItems.length === 0) return;
+    const confirmed = window.confirm(
+      copy.moves.dismissConfirm(movedItems.length),
+    );
+    if (!confirmed) return;
+
+    const logIds = new Set(movedItems.map((item) => item.logId));
+    setMovedItems([]);
+    undoStackRef.current = undoStackRef.current.filter(
+      (item) => !(item.type === "file" && logIds.has(item.logId)),
+    );
+  }
+
   async function resolveAction(action) {
     if (busyRef.current || flyActionRef.current || queueRef.current.length === 0) {
       return;
@@ -332,11 +450,25 @@ export default function App({
       if (action === "file") {
         const before = await browser.bookmarks.get(bookmark.id);
         await browser.bookmarks.move(bookmark.id, { parentId: dest });
-        undoStackRef.current.push({
-          type: "file",
-          bookmark,
+        const logId = newLogId();
+        const entry = {
+          logId,
+          bookmarkId: bookmark.id,
+          title: bookmark.title,
+          url: bookmark.url,
           previousParentId: before[0]?.parentId,
           previousIndex: before[0]?.index,
+          folderPath: bookmark.folderPath || "",
+          destinationParentId: dest,
+          destinationPath: destinationLabel(dest, folders),
+        };
+        rememberMoved(entry);
+        undoStackRef.current.push({
+          type: "file",
+          logId,
+          bookmark,
+          previousParentId: entry.previousParentId,
+          previousIndex: entry.previousIndex,
         });
         setStats((s) => ({ ...s, filed: s.filed + 1 }));
       } else if (action === "delete") {
@@ -372,6 +504,7 @@ export default function App({
           parentId: last.previousParentId,
           index: last.previousIndex,
         });
+        if (last.logId) forgetMoved(last.logId);
         setStats((s) => ({ ...s, filed: Math.max(0, s.filed - 1) }));
         setQueue((q) => [last.bookmark, ...q]);
       } else if (last.type === "delete" && last.previousParentId) {
@@ -457,10 +590,14 @@ export default function App({
           destFolderId={destFolderId}
           loading={loading}
           deletedItems={deletedItems}
+          movedItems={movedItems}
           undoBusy={busy}
           onUndoDelete={undoDeleteFromList}
           onRestoreAll={restoreAllDeleted}
           onEmptyTrash={emptyTrash}
+          onUndoMove={undoMoveFromList}
+          onUndoAllMoves={undoAllMoved}
+          onDismissMoved={dismissMovedList}
           onSourceChange={(value) => {
             setSourceFolderId(value);
             saveSettings(value, destFolderId);
@@ -479,11 +616,15 @@ export default function App({
           flyAction={flyAction}
           destIsTrash={destIsTrash}
           deletedItems={deletedItems}
+          movedItems={movedItems}
           onAction={resolveAction}
           onReset={resetToSetup}
           onUndoDelete={undoDeleteFromList}
           onRestoreAll={restoreAllDeleted}
           onEmptyTrash={emptyTrash}
+          onUndoMove={undoMoveFromList}
+          onUndoAllMoves={undoAllMoved}
+          onDismissMoved={dismissMovedList}
         />
       )}
     </div>

@@ -329,6 +329,10 @@ body::before {
   font-size: 0.75rem;
 }
 
+.deleted-folder.moved-to::before {
+  content: "→ ";
+}
+
 .field {
   display: grid;
   gap: 0.4rem;

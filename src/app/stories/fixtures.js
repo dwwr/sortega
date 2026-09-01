@@ -60,12 +60,38 @@ export const deletedItems = [
   },
 ];
 
+export const movedItems = [
+  {
+    logId: "move-1",
+    bookmarkId: "15",
+    title: "MDN",
+    url: "https://developer.mozilla.org/",
+    previousParentId: "1",
+    previousIndex: 2,
+    folderPath: "Bookmarks Bar",
+    destinationParentId: "2",
+    destinationPath: "Bookmarks Bar / Keep",
+  },
+  {
+    logId: "move-2",
+    bookmarkId: "16",
+    title: "Storybook",
+    url: "https://storybook.js.org/",
+    previousParentId: "3",
+    previousIndex: 0,
+    folderPath: "Bookmarks Bar / Later",
+    destinationParentId: "2",
+    destinationPath: "Bookmarks Bar / Keep",
+  },
+];
+
 export const setupDefaults = {
   folders,
   sourceFolderId: "all",
   destFolderId: DEST_TRASH,
   loading: false,
   deletedItems: [],
+  movedItems: [],
   undoBusy: false,
 };
 
@@ -76,4 +102,5 @@ export const deckDefaults = {
   flyAction: null,
   destIsTrash: true,
   deletedItems,
+  movedItems: [],
 };
