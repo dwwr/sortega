@@ -35,7 +35,9 @@ export default function DeckStage({
       <div className="stats">
         <span>{copy.deck.left(queue.length)}</span>
         <span>
-          {copy.deck.stats(stats.filed, stats.deleted, stats.skipped)}
+          {destIsTrash
+            ? copy.deck.statsTrash(stats.kept, stats.deleted)
+            : copy.deck.statsMove(stats.kept, stats.moved)}
         </span>
       </div>
 

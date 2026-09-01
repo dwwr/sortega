@@ -17,7 +17,7 @@ import {
 } from "./lib/bookmarks.js";
 import { copy } from "./copy.js";
 
-const emptyStats = { filed: 0, deleted: 0, skipped: 0 };
+const emptyStats = { kept: 0, deleted: 0, moved: 0 };
 
 function newLogId() {
   return crypto.randomUUID();
@@ -370,7 +370,7 @@ export default function App({
         (item) => item.logId !== logId,
       );
       if (activeRef.current) {
-        setStats((s) => ({ ...s, filed: Math.max(0, s.filed - 1) }));
+        setStats((s) => ({ ...s, moved: Math.max(0, s.moved - 1) }));
         setQueue((q) => [restored, ...q]);
       }
     } catch (error) {
@@ -406,7 +406,7 @@ export default function App({
       if (activeRef.current && restored.length > 0) {
         setStats((s) => ({
           ...s,
-          filed: Math.max(0, s.filed - restored.length),
+          moved: Math.max(0, s.moved - restored.length),
         }));
         setQueue((q) => [...restored, ...q]);
       }
@@ -470,12 +470,12 @@ export default function App({
           previousParentId: entry.previousParentId,
           previousIndex: entry.previousIndex,
         });
-        setStats((s) => ({ ...s, filed: s.filed + 1 }));
+        setStats((s) => ({ ...s, moved: s.moved + 1 }));
       } else if (action === "delete") {
         await deleteBookmark(bookmark);
       } else {
         undoStackRef.current.push({ type: "skip", bookmark });
-        setStats((s) => ({ ...s, skipped: s.skipped + 1 }));
+        setStats((s) => ({ ...s, kept: s.kept + 1 }));
       }
 
       setFlyAction(fly);
@@ -505,7 +505,7 @@ export default function App({
           index: last.previousIndex,
         });
         if (last.logId) forgetMoved(last.logId);
-        setStats((s) => ({ ...s, filed: Math.max(0, s.filed - 1) }));
+        setStats((s) => ({ ...s, moved: Math.max(0, s.moved - 1) }));
         setQueue((q) => [last.bookmark, ...q]);
       } else if (last.type === "delete" && last.previousParentId) {
         const created = await browser.bookmarks.create({
@@ -521,7 +521,7 @@ export default function App({
           ...q,
         ]);
       } else if (last.type === "skip") {
-        setStats((s) => ({ ...s, skipped: Math.max(0, s.skipped - 1) }));
+        setStats((s) => ({ ...s, kept: Math.max(0, s.kept - 1) }));
         setQueue((q) => [last.bookmark, ...q]);
       }
     } catch (error) {

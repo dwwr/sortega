@@ -41,8 +41,8 @@ export const copy = {
 
   deck: {
     left: (n) => `${n} left`,
-    stats: (filed, deleted, skipped) =>
-      `${filed} filed · ${deleted} deleted · ${skipped} skipped`,
+    statsTrash: (kept, deleted) => `${kept} kept · ${deleted} deleted`,
+    statsMove: (kept, moved) => `${kept} kept · ${moved} moved`,
     emptyTitle: "Deck clear.",
     backToSetup: "Back to setup",
     delete: "Delete",

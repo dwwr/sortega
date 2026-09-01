@@ -28,6 +28,7 @@ export const FolderDestination = {
     destIsTrash: false,
     deletedItems: [],
     movedItems,
+    stats: { kept: 3, deleted: 0, moved: 2 },
   },
 };
 
@@ -72,9 +73,9 @@ export const Interactive = {
         ]);
         setStats((s) => ({ ...s, deleted: s.deleted + 1 }));
       } else if (action === "file") {
-        setStats((s) => ({ ...s, filed: s.filed + 1 }));
+        setStats((s) => ({ ...s, moved: s.moved + 1 }));
       } else {
-        setStats((s) => ({ ...s, skipped: s.skipped + 1 }));
+        setStats((s) => ({ ...s, kept: s.kept + 1 }));
       }
 
       setCards(rest);

@@ -97,7 +97,7 @@ export const setupDefaults = {
 
 export const deckDefaults = {
   queue,
-  stats: { filed: 1, deleted: 2, skipped: 0 },
+  stats: { kept: 0, deleted: 2, moved: 0 },
   busy: false,
   flyAction: null,
   destIsTrash: true,
