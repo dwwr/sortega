@@ -13,8 +13,8 @@ export const copy = {
   },
 
   tagline: {
-    trashDestination: "Swipe right to delete · down to skip",
-    folderDestination: "Swipe left to delete · right to keep",
+    trashDestination: "Swipe left to delete · right to keep",
+    folderDestination: "Swipe left to stay · right to move",
   },
 
   route: {
@@ -47,6 +47,12 @@ export const copy = {
     backToSetup: "Back to setup",
     delete: "Delete",
     deleteTooltip: "Delete (←)",
+    keep: "Keep",
+    keepTooltip: "Keep (→)",
+    stay: "Stay",
+    stayTooltip: "Stay (←)",
+    move: "Move",
+    moveTooltip: "Move (→)",
     skip: "Skip",
     skipTooltip: "Skip (↓)",
     file: "Keep",
@@ -56,6 +62,9 @@ export const copy = {
 
   card: {
     stampTrash: "Trash",
+    stampKeep: "Keep",
+    stampStay: "Stay",
+    stampMove: "Move",
     stampFile: "Keep",
     stampDelete: "Delete",
     unknownHostInitial: "?",

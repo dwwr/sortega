@@ -121,9 +121,8 @@ Component stories for `BookmarkCard`, `SetupPanel`, `DeletedList`, and `DeckStag
 2. Choose **Destination** — `Trash (delete)` (default) or a folder for right-swipes
 3. **Start deck**
 4. For each card:
-   - **→** — send to destination (delete if Trash, otherwise move into the folder)
-   - **← / Delete** — delete (only shown when destination is a folder)
-   - **↓ / Skip** — leave it where it is and go to the next
+   - **Trash destination:** **←** delete · **→** keep (leave in place) · **↓** skip
+   - **Folder destination:** **←** stay · **→** move into the folder · **↓** skip
    - **Esc** — undo the last action in this session
 
 Each card shows a large site favicon, title, and URL (open the link to inspect the page).

@@ -16,7 +16,14 @@ export default function DeckStage({
   onEmptyTrash,
 }) {
   const visible = queue.slice(0, 2);
-  const sendLabel = destIsTrash ? copy.deck.delete : copy.deck.file;
+  const leftLabel = destIsTrash ? copy.deck.delete : copy.deck.stay;
+  const leftAction = destIsTrash ? "delete" : "skip";
+  const leftTooltip = destIsTrash
+    ? copy.deck.deleteTooltip
+    : copy.deck.stayTooltip;
+  const rightLabel = destIsTrash ? copy.deck.keep : copy.deck.move;
+  const rightAction = destIsTrash ? "skip" : "file";
+  const rightTooltip = destIsTrash ? copy.deck.keepTooltip : copy.deck.moveTooltip;
 
   return (
     <main className="stage">
@@ -57,17 +64,15 @@ export default function DeckStage({
       </div>
 
       <div className="actions">
-        {!destIsTrash ? (
-          <button
-            type="button"
-            className="fab delete"
-            title={copy.deck.deleteTooltip}
-            onClick={() => onAction("delete")}
-            disabled={busy || queue.length === 0}
-          >
-            {copy.deck.delete}
-          </button>
-        ) : null}
+        <button
+          type="button"
+          className={`fab ${destIsTrash ? "delete" : "skip"}`}
+          title={leftTooltip}
+          onClick={() => onAction(leftAction)}
+          disabled={busy || queue.length === 0}
+        >
+          {leftLabel}
+        </button>
         <button
           type="button"
           className="fab skip"
@@ -79,12 +84,12 @@ export default function DeckStage({
         </button>
         <button
           type="button"
-          className={`fab ${destIsTrash ? "delete" : "file"}`}
-          title={copy.deck.sendTooltip(sendLabel)}
-          onClick={() => onAction("file")}
+          className="fab file"
+          title={rightTooltip}
+          onClick={() => onAction(rightAction)}
           disabled={busy || queue.length === 0}
         >
-          {sendLabel}
+          {rightLabel}
         </button>
       </div>
 

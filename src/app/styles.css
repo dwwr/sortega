@@ -545,6 +545,12 @@ select:focus {
   transform: rotate(12deg);
 }
 
+.stamp-stay {
+  right: 1.15rem;
+  color: var(--muted);
+  transform: rotate(12deg);
+}
+
 .preview {
   display: grid;
   place-content: center;

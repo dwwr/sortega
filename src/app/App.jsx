@@ -125,14 +125,13 @@ export default function App({
   useEffect(() => {
     function onKeyDown(event) {
       if (!activeRef.current) return;
+      const trashDest = isTrashDestination(destRef.current);
       if (event.key === "ArrowLeft") {
         event.preventDefault();
-        if (!isTrashDestination(destRef.current)) {
-          resolveAction("delete");
-        }
+        resolveAction(trashDest ? "delete" : "skip");
       } else if (event.key === "ArrowRight") {
         event.preventDefault();
-        resolveAction("file");
+        resolveAction(trashDest ? "skip" : "file");
       } else if (event.key === "ArrowDown") {
         event.preventDefault();
         resolveAction("skip");
@@ -325,26 +324,21 @@ export default function App({
 
     const bookmark = queueRef.current[0];
     const dest = destRef.current;
-    const trashDest = isTrashDestination(dest);
     setBusy(true);
 
     let fly = action;
 
     try {
       if (action === "file") {
-        if (trashDest) {
-          await deleteBookmark(bookmark);
-        } else {
-          const before = await browser.bookmarks.get(bookmark.id);
-          await browser.bookmarks.move(bookmark.id, { parentId: dest });
-          undoStackRef.current.push({
-            type: "file",
-            bookmark,
-            previousParentId: before[0]?.parentId,
-            previousIndex: before[0]?.index,
-          });
-          setStats((s) => ({ ...s, filed: s.filed + 1 }));
-        }
+        const before = await browser.bookmarks.get(bookmark.id);
+        await browser.bookmarks.move(bookmark.id, { parentId: dest });
+        undoStackRef.current.push({
+          type: "file",
+          bookmark,
+          previousParentId: before[0]?.parentId,
+          previousIndex: before[0]?.index,
+        });
+        setStats((s) => ({ ...s, filed: s.filed + 1 }));
       } else if (action === "delete") {
         await deleteBookmark(bookmark);
       } else {

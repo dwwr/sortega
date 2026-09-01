@@ -52,10 +52,10 @@ export const Interactive = {
       if (busy || cards.length === 0) return;
       const [current, ...rest] = cards;
       setBusy(true);
-      setFlyAction(action === "file" && args.destIsTrash ? "file" : action);
+      setFlyAction(action);
       await new Promise((resolve) => setTimeout(resolve, 280));
 
-      if (action === "delete" || (action === "file" && args.destIsTrash)) {
+      if (action === "delete") {
         setTrash((items) => [
           {
             logId: `log-${Date.now()}`,
