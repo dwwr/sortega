@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { fn } from "storybook/test";
 import DeckStage from "./DeckStage.jsx";
-import { deckDefaults, deletedItems, queue } from "../stories/fixtures.js";
+import { deckDefaults, deletedItems, movedItems, queue } from "../stories/fixtures.js";
 
 const meta = {
   title: "Components/DeckStage",
@@ -13,6 +13,9 @@ const meta = {
     onUndoDelete: fn(),
     onRestoreAll: fn(),
     onEmptyTrash: fn(),
+    onUndoMove: fn(),
+    onUndoAllMoves: fn(),
+    onDismissMoved: fn(),
   },
 };
 
@@ -24,6 +27,8 @@ export const FolderDestination = {
   args: {
     destIsTrash: false,
     deletedItems: [],
+    movedItems,
+    stats: { kept: 3, deleted: 0, moved: 2 },
   },
 };
 
@@ -52,10 +57,10 @@ export const Interactive = {
       if (busy || cards.length === 0) return;
       const [current, ...rest] = cards;
       setBusy(true);
-      setFlyAction(action === "file" && args.destIsTrash ? "file" : action);
+      setFlyAction(action);
       await new Promise((resolve) => setTimeout(resolve, 280));
 
-      if (action === "delete" || (action === "file" && args.destIsTrash)) {
+      if (action === "delete") {
         setTrash((items) => [
           {
             logId: `log-${Date.now()}`,
@@ -68,9 +73,9 @@ export const Interactive = {
         ]);
         setStats((s) => ({ ...s, deleted: s.deleted + 1 }));
       } else if (action === "file") {
-        setStats((s) => ({ ...s, filed: s.filed + 1 }));
+        setStats((s) => ({ ...s, moved: s.moved + 1 }));
       } else {
-        setStats((s) => ({ ...s, skipped: s.skipped + 1 }));
+        setStats((s) => ({ ...s, kept: s.kept + 1 }));
       }
 
       setCards(rest);

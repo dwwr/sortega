@@ -72,11 +72,11 @@ export default function BookmarkCard({
     setDragging(false);
 
     if (x > SWIPE_THRESHOLD) {
-      onSwipe?.("file");
+      onSwipe?.(destIsTrash ? "skip" : "file");
       return;
     }
     if (x < -SWIPE_THRESHOLD) {
-      onSwipe?.("delete");
+      onSwipe?.(destIsTrash ? "delete" : "skip");
       return;
     }
     if (y > SWIPE_THRESHOLD) {
@@ -122,14 +122,14 @@ export default function BookmarkCard({
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
-      <div
-        className={`stamp stamp-file${destIsTrash ? " trash" : ""}`}
-        style={{ opacity: fileOpacity }}
-      >
-        {destIsTrash ? copy.card.stampTrash : copy.card.stampFile}
+      <div className="stamp stamp-file" style={{ opacity: fileOpacity }}>
+        {destIsTrash ? copy.card.stampKeep : copy.card.stampMove}
       </div>
-      <div className="stamp stamp-delete" style={{ opacity: deleteOpacity }}>
-        {copy.card.stampDelete}
+      <div
+        className={`stamp ${destIsTrash ? "stamp-delete" : "stamp-stay"}`}
+        style={{ opacity: deleteOpacity }}
+      >
+        {destIsTrash ? copy.card.stampDelete : copy.card.stampStay}
       </div>
 
       <div className="preview">
@@ -140,6 +140,8 @@ export default function BookmarkCard({
             alt=""
             width={128}
             height={128}
+            draggable={false}
+            onDragStart={(event) => event.preventDefault()}
             onError={() => setIconFailed(true)}
           />
         ) : (

@@ -13,8 +13,8 @@ export const copy = {
   },
 
   tagline: {
-    trashDestination: "Swipe right to delete · down to skip",
-    folderDestination: "Swipe left to delete · right to keep",
+    trashDestination: "Swipe left to delete · right to keep",
+    folderDestination: "Swipe left to stay · right to move",
   },
 
   route: {
@@ -41,12 +41,18 @@ export const copy = {
 
   deck: {
     left: (n) => `${n} left`,
-    stats: (filed, deleted, skipped) =>
-      `${filed} filed · ${deleted} deleted · ${skipped} skipped`,
+    statsTrash: (kept, deleted) => `${kept} kept · ${deleted} deleted`,
+    statsMove: (kept, moved) => `${kept} kept · ${moved} moved`,
     emptyTitle: "Deck clear.",
     backToSetup: "Back to setup",
     delete: "Delete",
     deleteTooltip: "Delete (←)",
+    keep: "Keep",
+    keepTooltip: "Keep (→)",
+    stay: "Stay",
+    stayTooltip: "Stay (←)",
+    move: "Move",
+    moveTooltip: "Move (→)",
     skip: "Skip",
     skipTooltip: "Skip (↓)",
     file: "Keep",
@@ -56,6 +62,9 @@ export const copy = {
 
   card: {
     stampTrash: "Trash",
+    stampKeep: "Keep",
+    stampStay: "Stay",
+    stampMove: "Move",
     stampFile: "Keep",
     stampDelete: "Delete",
     unknownHostInitial: "?",
@@ -74,6 +83,19 @@ export const copy = {
       `Empty trash? This clears ${count} item(s) from the list. Bookmarks already removed stay deleted.`,
   },
 
+  moves: {
+    title: "Moved",
+    ariaLabel: "Moved bookmarks",
+    undoAll: "Undo all",
+    undoAllTooltip: "Move every item back to its original folder",
+    dismissAll: "Dismiss list",
+    dismissAllTooltip: "Clear this list without moving bookmarks",
+    undo: "Undo",
+    undoTooltip: "Move back to original folder",
+    dismissConfirm: (count) =>
+      `Dismiss the moved list? ${count} bookmark(s) stay in their destination folders.`,
+  },
+
   alerts: {
     loadBookmarksFailed: (detail) => `Could not load bookmarks: ${detail}`,
     pickDestination: "Pick a destination.",
@@ -81,8 +103,11 @@ export const copy = {
     actionFailed: (action, detail) => `Could not ${action} bookmark: ${detail}`,
     undoFailed: (detail) => `Undo failed: ${detail}`,
     restoreFailed: (detail) => `Restore failed: ${detail}`,
+    undoMoveFailed: (detail) => `Undo move failed: ${detail}`,
     restorePartial: (ok, failed) =>
       `Restored ${ok}, but ${failed} failed.`,
+    undoMovePartial: (ok, failed) =>
+      `Moved back ${ok}, but ${failed} failed.`,
     originalFolderUnknown: "Original folder is unknown.",
   },
 };

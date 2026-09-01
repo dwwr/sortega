@@ -2,7 +2,7 @@ import { useState } from "react";
 import { fn } from "storybook/test";
 import SetupPanel from "./SetupPanel.jsx";
 import { DEST_TRASH } from "../lib/bookmarks.js";
-import { deletedItems, folders, setupDefaults } from "../stories/fixtures.js";
+import { deletedItems, folders, movedItems, setupDefaults } from "../stories/fixtures.js";
 
 const meta = {
   title: "Components/SetupPanel",
@@ -15,6 +15,9 @@ const meta = {
     onUndoDelete: fn(),
     onRestoreAll: fn(),
     onEmptyTrash: fn(),
+    onUndoMove: fn(),
+    onUndoAllMoves: fn(),
+    onDismissMoved: fn(),
   },
 };
 
@@ -38,6 +41,13 @@ export const FolderDestination = {
 export const WithTrash = {
   args: {
     deletedItems,
+  },
+};
+
+export const WithMoved = {
+  args: {
+    destFolderId: "2",
+    movedItems,
   },
 };
 
