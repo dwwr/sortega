@@ -140,6 +140,8 @@ export default function BookmarkCard({
             alt=""
             width={128}
             height={128}
+            draggable={false}
+            onDragStart={(event) => event.preventDefault()}
             onError={() => setIconFailed(true)}
           />
         ) : (
